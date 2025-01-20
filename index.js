@@ -6,6 +6,7 @@ require("dotenv").config();
 const db = require("./config/dbConnector");
 const auth = require("./routes/auth");
 const media = require("./routes/media");
+const ats = require("./routes/ats");
 
 db.connect();
 app.use(express.json());
@@ -13,6 +14,7 @@ app.use(cors());
 
 app.use("/api/v1/auth" , auth);
 app.use("/api/v1/media" , media);
+app.use("/api/v1/ats" , ats)
 
 app.get("/" , (req , res) => {
     res.send(`<h1>Server started successfully</h1>`);
