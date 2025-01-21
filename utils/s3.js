@@ -51,3 +51,25 @@ exports.getObject = async(key) => {
         throw new Error("Failed to generate presigned get url");
     }
 }
+
+exports.uploadDirect = async (filename, fileBuffer, contentType) => {
+    try {
+      const command = new PutObjectCommand({
+        Bucket: "probie-global-bucket",
+        Key: `/uploads/user-uploads/${filename}`,
+        Body: fileBuffer,
+        ContentType: contentType,
+      });
+  
+      const response = await s3.send(command);
+      return {
+        success: true,
+        message: "File uploaded successfully",
+        key: `/uploads/user-uploads/${filename}`,
+        response,
+      };
+    } catch (err) {
+      console.log(err);
+      throw new Error("Failed to upload file directly to S3");
+    }
+  };

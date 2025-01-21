@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 const { auth } = require("../middlewares/Auth");
-const { s3UploadLimit } = require("../controllers/Redis-Wrapper");
+const { isResultReady } = require("../controllers/Redis-Wrapper");
 
-router.get("/s3-upload-limit" , auth , s3UploadLimit);
+router.get("/result" , auth , isResultReady);
 
 module.exports = router;

@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 require("dotenv").config();
 
+
 const db = require("./config/dbConnector");
 const auth = require("./routes/auth");
 const media = require("./routes/media");
