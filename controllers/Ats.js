@@ -1,5 +1,17 @@
-const { uploadDirect } = require("../utils/s3");
+const { uploadDirect, getObject } = require("../utils/s3");
 const { blockUser } = require("./Redis-Wrapper");
+const {Queue} = require("bullmq");
+require("dotenv").config();
+
+const connection = {
+    host : process.env.REDIS_HOST,
+    port : process.env.REDIS_PORT,
+    password : process.env.REDIS_PASS
+}
+
+const mssgQueue = new Queue('Task-Queue' , {
+    connection
+});
 
 exports.findATS = async(req , res) => {
 
@@ -16,9 +28,9 @@ exports.findATS = async(req , res) => {
             });
         }
 
-       
+        const uploadFileName = `${Date.now()}`;
         const uploadFile = await uploadDirect(
-            `${Date.now()}`,
+            uploadFileName,
             file.buffer,
             'application/pdf'
         )
@@ -33,6 +45,14 @@ exports.findATS = async(req , res) => {
         if(ok !== 'true'){
             throw new Error("Something went wrong while blocking the user");
         }
+
+        const preSignedGetUrl = await getObject(uploadFileName);
+        const trial = await mssgQueue.add('Trial Model Task' , {
+            url : preSignedGetUrl,
+            name: uploadFileName
+        })
+
+        console.log("ake Trial : " , trial);
 
         return res.status(200).json({
             success : true,

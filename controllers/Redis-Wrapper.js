@@ -9,6 +9,7 @@ const redis = new Redis({
 
 redis.on("error" , ((err) => {
     console.log(err);
+    console.log("redis connection error")
 }))
 
 redis.on("connect" ,() => console.log("Redis connection successfull"));
@@ -125,4 +126,32 @@ exports.isResultReady = async(req , res) => {
 }
 
 //endPointForModel
-// exports.post()
+exports.post = async(req , res) => {
+
+    try{
+
+        const {mssg , userId} = req.body;
+
+        if(!mssg || !userId){
+            return res.status(400).json({
+                success : false,
+                message : "Missing Fields"
+            });
+        }
+
+        console.log(mssg);
+
+        await redis.setex(`ats-results-${userId}` , 120 , mssg);
+
+        return res.status(200).json({
+            success : true
+        });
+
+    }catch(err){
+        return res.status(500).json({
+            success : false,
+            message : "Endpoint for model result upload failed"
+        });
+    }
+
+}
